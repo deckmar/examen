@@ -1,0 +1,22 @@
+{
+  "name": "Examen",
+  "version": "0.0.1",
+  "authors": [
+    "Johan Deckmar <deckmar@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "Private for now",
+  "homepage": "  ",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+  }
+}
