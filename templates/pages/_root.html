@@ -1,90 +1,57 @@
-<div layout="row">
+<div layout="column" layout-align="start center">
 
-	<div flex>
-		<md-input-container>
-			<label>Kurser</label>
-			<textarea style="height: 200px;" autofocus ng-model="mainCtrl.coursesTxt"></textarea>
-		</md-input-container>
+	<md-toolbar layout-padding layout layout-align="center center" class="md-tall md-accent">
+		<h3 style="font-weight: normal;">Kursöversikt för examensansökan</h3>
+	</md-toolbar>
 
-		<div ng-if="mainCtrl.error" layout-padding>
-			<p layout-padding style="background: #d11; color: black;">
-				<md-icon>warning</md-icon>
-				{{ mainCtrl.error}}
-			</p>
-		</div>
+	<div class="container" layout="column">
 
-		<h1 class="md-title">Hittade {{ mainCtrl.possibleSolutions.length }} möjligheter</h1>
-		<div class="" ng-if="mainCtrl.possibleSolutions.length > 0">
 
-			<md-tabs md-dynamic-height="true">
-				<md-tab ng-repeat="solution in mainCtrl.possibleSolutions" label="{{ $index + 1 }}">
-					<div layout-padding class="" ng-repeat="solExam in solution.solutionExams">
+		<!-- Topics -->
 
-						<h1 class="md-title">{{ solExam.examen.name }}</h1>
-						<p ng-repeat="course in solExam.courseList">
-							[{{ course.courseId }}]
-							{{ course.name }},
-							{{ course.level | levelToString }}-kurs
-							({{ course.points }}hp)
-						</p>
+		<md-toolbar layout-padding>
+			<h3 class="md-title">Steg 1. Se till att alla ämnen du läst finns i denna lista</h3>
+		</md-toolbar>
+		<md-subheader>
+			Om du saknar ett ämnesområde så skriv in det, exempelvis: <strong>(MA) Matematik</strong>. Tryck sedan enter för att det ska läggas till.
+		</md-subheader>
+		<md-content layout-padding>
+			<md-chips ng-model="mainCtrl.topics" md-on-append="mainCtrl.addTopic($chip)">
+				<md-chip-template>
+					{{ $chip.name }}
+				</md-chip-template>
+			</md-chips>
+		</md-content>
 
-					</div>
-				</md-tab>
-			</md-tabs>
 
-		</div>
-	</div>
 
-	<div flex>
-		<h1 class="md-title">Ämnen</h1>
-		<md-chips ng-model="mainCtrl.topics" md-on-append="mainCtrl.addTopic($chip)">
-			<md-chip-template>
-				{{ $chip.name }}
-			</md-chip-template>
-		</md-chips>
 
-		<h1 class="md-title">Alla kurser</h1>
-		<md-list>
-			<md-list-item class="md-2-line" ng-repeat="course in mainCtrl.courses">
-				<img ng-src="" />
-				<div class="md-list-item-text" layout="column"
-					ng-style="{background: (course.courseId && course.name && course.topic && course.points && course.level) ? '' : '#d11'}">
-					<h3>{{ course.name }}</h3>
-					<p>
-						[{{ course.courseId }}]
-						En
-						<strong>{{ course.level | levelToString }}</strong>
-						kurs på
-						<strong>{{ course.points }}</strong>
-						poäng i ämnet
-						<strong>{{ course.topic.name }}</strong>.
-					 </p>
-				</div>
-			</md-list-item>
-		</md-list>
+		<!-- Examens -->
 
-		<h1 class="md-title">Examen{{ mainCtrl.examens.length > 1 ? 's' : ''}}</h1>
-		<div layout="column" layout-align="start center">
-			<div class="md-whiteframe-z2" ng-repeat="examen in mainCtrl.examens" style="margin-bottom: 16px; width: 100%;">
+		<md-toolbar layout-padding>
+			<h3 class="md-title">Steg 2. Lägg till de examen du söker och deras poäng-krav</h3>
+		</md-toolbar>
+		<div layout="column" layout-align="start center" style="padding-bottom: 12px;">
+			<div class="md-whiteframe-z2" ng-repeat="examen in mainCtrl.examens" style="margin: 26px; width: 80%; padding-bottom: 12px;">
 				<md-content>
-					<md-toolbar>
+					<md-toolbar class="md-accent">
 						<div class="md-toolbar-tools" layout="row" layout-align="stretch center">
-			        <!-- <md-button class="md-icon-button" aria-label="Settings">
-			          <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
-			        </md-button> -->
+							<!-- <md-button class="md-icon-button" aria-label="Settings">
+								<md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
+							</md-button> -->
 							<input flex type="text" ng-model="examen.name" style="width:80%; background: transparent; border: none; color: white;" />
 
-			        <md-button class="md-icon-button" aria-label="Delete" ng-click="mainCtrl.removeExamen(examen)">
-			          <md-icon>delete</md-icon>
-			        </md-button>
-			      </div>
+							<md-button class="md-icon-button" aria-label="Delete" ng-click="mainCtrl.removeExamen(examen)">
+								<md-icon>delete</md-icon>
+							</md-button>
+						</div>
 					</md-toolbar>
 
 					<div class="">
 						<md-content>
 							<md-list>
 								<div ng-repeat="constr in examen.constraints">
-									<md-list-item class="md-3-line">
+									<md-list-item class="md-3-line" layout-padding>
 										<div ng-switch="constr.type">
 											<div ng-switch-when="MinimumConstraint" class="md-list-item-text" layout="column">
 												<h3>Krav minimum poäng</h3>
@@ -107,6 +74,12 @@
 												<p>Säkerställer att kursen är med i just denna examen</p>
 											</div>
 										</div>
+
+										<span flex></span>
+
+										<md-button ng-click="mainCtrl.removeConstraint(examen, constr)" class="md-icon-button md-accent" style="margin-right: 0px;">
+											<md-icon>delete</md-icon>
+										</md-button>
 									</md-list-item>
 									<md-divider ng-if="!$last"></md-divider>
 								</div>
@@ -138,8 +111,99 @@
 		</div>
 
 
-	</div>
 
+
+		<!-- Courses -->
+
+		<md-toolbar layout-padding>
+			<h3 class="md-title">Steg 3. Klistra in dina kurser</h3>
+		</md-toolbar>
+		<md-subheader>
+			<p>Formatet på dina kurser är: Kurskod, Namn på kurs, A/B/C/AV, 7hp.</p>
+		</md-subheader>
+
+		<div class="" layout="row" layout-align="space-around center">
+			<p style="color: #999; font-size: 8pt;" flex="33" layout="column" layout-align="center center">
+				<strong>Exempelvis:</strong><br><br>
+				FY0012, Kurs Ett, A, 6.5hp<br>
+				JO2111, Kurs Två, A, 6.5hp<br>
+				MA0001, Kurs Tre, B, 7hp<br>
+				MA0002, Kurs Fyra, AV, 30hp<br>
+			</p>
+
+			<md-input-container style="width: 80%;" layout-padding>
+				<label>Kurser i text-format:</label>
+				<textarea class="md-whiteframe-z5" style="height: 500px; font-size: 8pt; border: 1px solid #abc; border-radius: 4px; padding: 8px;" ng-model="mainCtrl.coursesTxt"></textarea>
+			</md-input-container>
+		</div>
+
+
+
+
+
+
+
+		<!-- Courses check -->
+
+		<md-toolbar layout-padding class="mt20">
+			<h3 class="md-title">Steg 4. Se över att kurserna tolkats rätt ({{ mainCtrl.courses.length }} st)</h3>
+		</md-toolbar>
+
+		<div ng-if="mainCtrl.error" layout-padding>
+			<p layout-padding style="background: #d11; color: black;">
+				<md-icon>warning</md-icon>
+				{{ mainCtrl.error}}
+			</p>
+		</div>
+
+		<md-list>
+			<md-list-item class="md-2-line" ng-repeat="course in mainCtrl.courses">
+				<img ng-src="" />
+				<div class="md-list-item-text" layout="column"
+					ng-style="{background: (course.courseId && course.name && course.topic && course.points && course.level) ? '' : '#d11'}">
+					<h3>{{ course.name }}</h3>
+					<p>
+						[{{ course.courseId }}]
+						En
+						<strong>{{ course.level | levelToString }}</strong>
+						kurs på
+						<strong>{{ course.points }}</strong>
+						poäng i ämnet
+						<strong>{{ course.topic.name }}</strong>.
+					 </p>
+				</div>
+			</md-list-item>
+		</md-list>
+
+
+
+
+
+		<!-- Results -->
+
+		<md-toolbar layout-padding class="mt20">
+			<h3 class="md-title">Granska resultatet (hittade {{ mainCtrl.possibleSolutions.length }})</h3>
+		</md-toolbar>
+
+		<div class="" ng-if="mainCtrl.possibleSolutions.length > 0">
+			<md-tabs md-dynamic-height="true">
+				<md-tab ng-repeat="solution in mainCtrl.possibleSolutions | limitTo: 5 track by $index" label="{{ $index + 1 }}">
+					<div layout-padding class="" ng-repeat="solExam in solution.solutionExams">
+
+						<h1 class="md-title">{{ solExam.examen.name }}</h1>
+						<p ng-repeat="course in solExam.courseList">
+							[{{ course.courseId }}]
+							{{ course.name }},
+							{{ course.level | levelToString }}-kurs
+							({{ course.points }}hp)
+						</p>
+
+					</div>
+				</md-tab>
+			</md-tabs>
+
+		</div>
+	</div>
 
 
 </div>

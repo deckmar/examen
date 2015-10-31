@@ -74,7 +74,7 @@ class MinimumConstraint extends Constraint {
 		this.type = 'MinimumConstraint';
 	}
 	validate(courseList : Course[]) {
-		var courses = <Course[]>angular.copy(courseList);
+		var courses = courseList;
 
 		if (this.topic && this.topic.name.indexOf("(*)") !== 0) {
 			courses = _.reject(courses, (c) => c.topic.name != this.topic.name);
@@ -104,12 +104,12 @@ app.controller('MainCtrl', function($scope, $state, $http) {
 		"MA0002, Name Four, A, 6.5hp";
 
 	mainCtrl.topics = [
-		new Topic("(*) Valfritt"),
 		new Topic("(MA) Matematik"),
 		new Topic("(FY) Fysik"),
 		new Topic("(DA) Datateknik"),
-		new Topic("(EK) Ekonomi"),
+		new Topic("(FÖ) Företagsekonomi"),
 		new Topic("(JO) Journalistik"),
+		new Topic("(*) Valfritt"),
 	];
 
 	mainCtrl.addTopic = function(topicStr : string) {
@@ -118,11 +118,13 @@ app.controller('MainCtrl', function($scope, $state, $http) {
 
 	mainCtrl.examens = [
 		new Examen("Kandidat i Industriell Ekonomi", [
-			new SpecificCourseConstraint("MA0001"),
-			new SpecificCourseConstraint("MA0002"),
-			new MinimumConstraint(mainCtrl.topics[0], Level.A, 13),
+			new MinimumConstraint(mainCtrl.topics[3], Level.C, 30),
+			new MinimumConstraint(mainCtrl.topics[5], Level.A, 150),
 		]),
-		new Examen("Civilingenjör i Industriell Ekonomi", [])
+		new Examen("Civilingenjör i Industriell Ekonomi", [
+			new MinimumConstraint(mainCtrl.topics[5], Level.A, 150),
+			new MinimumConstraint(mainCtrl.topics[3], Level.AV, 30),
+		])
 	];
 
 	mainCtrl.addExamen = function(name : string) {
@@ -145,6 +147,11 @@ app.controller('MainCtrl', function($scope, $state, $http) {
 		examen.constraints.push(constraint);
 	};
 
+
+	mainCtrl.removeConstraint = function(examen : Examen, constraint : Constraint) {
+		if (!confirm("Är du säker på att du vill ta bort denna?")) return;
+		examen.constraints = _.reject(examen.constraints, (c) => c === constraint);
+	}
 
 	var validateSolution = function(solution : Solution) {
 		return _.every(solution.solutionExams, function(se : SolutionExamen) {
