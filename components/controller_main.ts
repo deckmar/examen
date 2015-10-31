@@ -148,26 +148,37 @@ app.controller('MainCtrl', function($scope, $state, $http) {
 
 	var validateSolution = function(solution : Solution) {
 		return _.every(solution.solutionExams, function(se : SolutionExamen) {
-			return _.every(se.examen.constraints, (c : Constraint) => c.validate(se.courseList));
+			var originalExamen = _.find(mainCtrl.examens, (e : Examen) => e.name === se.examen.name);
+			return _.every(originalExamen.constraints, (c : Constraint) => c.validate(se.courseList));
 		});
 	}
 
+	var skipTheRest = false;
 	var findPossibleSolutionStep = function(solution : Solution, courseIdx : number) {
 
+		if (skipTheRest) return;
+
 		if (courseIdx >= mainCtrl.courses.length) {
-			console.log("Hit the bottom", solution, courseIdx);
-			if (validateSolution(solution)) mainCtrl.possibleSolutions.push(solution);
-			return;
+			//console.log("Hit the bottom", solution, courseIdx);
+			if (validateSolution(solution)) {
+				mainCtrl.possibleSolutions.push(solution);
+				return true;
+			}
+			return false;
 		}
+
 
 		_.each(solution.solutionExams, function(e : SolutionExamen) {
 
 			var solutionSub = angular.copy(solution);
+			_.each(solutionSub.solutionExams, (e) => e.examen.constraints = null);
 			var solutionEx = _.find(solutionSub.solutionExams, (se) => se.examen.name === e.examen.name);
 			solutionEx.courseList.push(mainCtrl.courses[courseIdx]);
-			findPossibleSolutionStep(solutionSub, courseIdx + 1);
+			var foundResult = findPossibleSolutionStep(solutionSub, courseIdx + 1);
+			if (foundResult) skipTheRest = true;
 		});
 
+		return false;
 	};
 
 	var findPossibleSolutions = function() {
@@ -175,6 +186,7 @@ app.controller('MainCtrl', function($scope, $state, $http) {
 		if (!mainCtrl.examens) return;
 
 		mainCtrl.possibleSolutions = <Solution[]> [];
+		skipTheRest = false;
 
 		// To some sanity checks
 		mainCtrl.error = false;
