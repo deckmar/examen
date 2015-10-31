@@ -10,10 +10,11 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider) {
 		.state('root', {
 			url: '/',
 			controller: 'MainCtrl as mainCtrl',
-			templateUrl: 'templates/pages/_root.html'
+			templateUrl: 'templates/pages/root.html'
 		})
 
 })
+
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
